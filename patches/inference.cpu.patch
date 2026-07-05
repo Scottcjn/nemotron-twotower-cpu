@@ -1,0 +1,16 @@
+--- inference.py	2026-07-04 13:58:41.507363860 +0000
++++ inference_cpu.py	2026-07-04 14:34:10.268118659 +0000
+@@ -67,10 +67,10 @@
+ elif args.mode == "ar":
+     # AR uses only the context tower + context head; keep the denoiser tower
+     # off the GPU so a single card suffices.
+-    model.context_tower = model.context_tower.cuda()
+-    model.context_lm_head = model.context_lm_head.cuda()
++    model.context_tower = model.context_tower.to("cpu")
++    model.context_lm_head = model.context_lm_head.to("cpu")
+ else:
+-    model.cuda()
++    model.to("cpu")
+ 
+ model.eval()
+ # Build the request list. A --prompt-file (jsonl, one {"text": ...} per line,

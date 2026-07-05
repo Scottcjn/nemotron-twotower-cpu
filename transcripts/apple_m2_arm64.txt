@@ -1,0 +1,7 @@
+# Kernel shim verified on Apple Silicon M2 (arm64, torch 2.8.0, MPS available)
+$ python3 arm_kernel_test.py
+arch=arm64 torch=2.8.0 mps=True
+rmsnorm_fn err=0.00e+00 OK
+ssd_scan err=0.00e+00 OK
+causal_conv1d causal: True OK
+=== ARM KERNEL SHIM: ALL PASS ✅ ===

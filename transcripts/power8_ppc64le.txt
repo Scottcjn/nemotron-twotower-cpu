@@ -1,0 +1,24 @@
+# Nemotron TwoTower on IBM POWER8 (ppc64le, 16c/128t, CPU only, no GPU)
+# transformers 4.51, torch 2.1.2, bf16, OMP_NUM_THREADS=24, nice+15
+
+$ PYTHONPATH=./mamba_shim python inference_cpu.py --mode ar --max-new-tokens 24 \
+    "Explain in one sentence why the sky is blue."
+
+The fast path is not available ... Falling back to the naive implementation.
+Loading checkpoint shards: 100%|██████████| 24/24 [00:07<00:00, 3.41it/s]
+
+Generated (24 tokens, 144.92s, 0.2 tok/s):
+ The sky is blue because of the way light is scattered by the atmosphere. When
+
+--------------------------------------------------------------------------------
+
+$ PYTHONPATH=./mamba_shim python inference_cpu.py --mode mask_diffusion \
+    --max-new-tokens 32 --block-size 16 --steps-per-block 16 \
+    "Explain in one sentence why the sky is blue."
+
+Generated (31 NFE, 32 tokens, 2105.52s):
+ The sky is blue because the atmosphere scatters shorter wavelengths of light
+ more than longer ones, with blue light being scattered the most.
+
+# ^ the FULL two-tower diffusion path (frozen context tower + trained denoiser
+#   tower) running on a POWER8 CPU. Slow (naive SSD scan) but correct.

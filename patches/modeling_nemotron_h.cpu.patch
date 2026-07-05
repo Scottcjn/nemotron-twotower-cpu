@@ -1,0 +1,36 @@
+--- modeling_nemotron_h.py.bak	2026-07-04 14:37:26.313095647 +0000
++++ modeling_nemotron_h.py	2026-07-04 14:37:26.333095750 +0000
+@@ -249,19 +249,19 @@
+         self, layer_idx: int, new_conv_state: torch.Tensor, cache_init: bool = False
+     ) -> torch.Tensor:
+         if cache_init:
+-            self.conv_states[layer_idx] = new_conv_state.to(self.conv_states.device)
++            self.conv_states[layer_idx] = new_conv_state.to(self.conv_states[layer_idx].device)
+         else:
+             self.conv_states[layer_idx] = self.conv_states[layer_idx].roll(shifts=-1, dims=-1)
+-            self.conv_states[layer_idx][:, :, -1] = new_conv_state[:, 0, :].to(self.conv_states.device)
++            self.conv_states[layer_idx][:, :, -1] = new_conv_state[:, 0, :].to(self.conv_states[layer_idx].device)
+         return self.conv_states[layer_idx]
+ 
+     def update_ssm_state(self, layer_idx: int, new_ssm_state: torch.Tensor):
+-        self.ssm_states[layer_idx] = new_ssm_state.to(self.ssm_states.device)
++        self.ssm_states[layer_idx] = new_ssm_state.to(self.ssm_states[layer_idx].device)
+         return self.ssm_states[layer_idx]
+ 
+     def reset(self):
+-        self.conv_states.zero_()
+-        self.ssm_states.zero_()
++        [t.zero_() for t in self.conv_states]
++        [t.zero_() for t in self.ssm_states]
+ 
+ class MambaRMSNormGated(torch.nn.Module):
+     def __init__(self, hidden_size, group_size, eps=1e-5):
+@@ -563,7 +563,7 @@
+         A = -torch.exp(self.A_log.float())                            # [num_heads]
+         if cache_params is not None and cache_position is not None and cache_position[0] > 0:
+             # We need to guarantee that anything regarding the cache is on the same device
+-            cache_device = cache_params.ssm_states.device
++            cache_device = cache_params.ssm_states[self.layer_idx].device
+ 
+             # Note: there is no need to pad parameter matrices here, as there is just one new token
+             # for batched generation
