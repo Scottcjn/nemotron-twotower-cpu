@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 import torch, torch.nn.functional as F
 
 def causal_conv1d_fn(x, weight, bias=None, activation=None, initial_states=None, **kw):

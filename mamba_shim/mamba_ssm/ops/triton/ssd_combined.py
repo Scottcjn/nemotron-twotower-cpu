@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Vectorized Mamba-2 SSD scan (segsum form), no Python sequence loop.
 # For block length L this is the quadratic single-chunk form: O(L^2) but fully
 # vectorized (einsum), so it uses all cores instead of one. Matches the naive

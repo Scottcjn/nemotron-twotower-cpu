@@ -1,7 +1,7 @@
 # Attribution & third-party terms
 
 This repository contains **only** original code (a kernel shim, patch files, and
-scripts) under the MIT License. It does **not** redistribute any NVIDIA model
+scripts) under the AGPL-3.0-or-later license. It does **not** redistribute any NVIDIA model
 weights or NVIDIA source code.
 
 - **The model**, `nvidia/Nemotron-Labs-TwoTower-30B-A3B-Base-BF16`, you download

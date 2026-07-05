@@ -65,4 +65,4 @@ The point of running the teacher on a CPU at all: **distillation for hardware pe
 
 ## License
 
-Our code (the shim, patches, scripts) is MIT, see [`LICENSE`](LICENSE). It contains no NVIDIA weights and no NVIDIA source; the patches are diffs you apply to files you download yourself. Use of NVIDIA's model is governed by the NVIDIA Nemotron Open Model License, see [`NOTICE.md`](NOTICE.md). The Mamba-2 and causal-conv algorithms reimplemented here are from [state-spaces/mamba](https://github.com/state-spaces/mamba) (Apache-2.0).
+Our code (the shim, scripts, and the changes in the patches) is licensed **AGPL-3.0-or-later**, see [`LICENSE`](LICENSE). It contains no NVIDIA weights and no NVIDIA source; the patches are unified diffs you apply to files you download yourself. Use of NVIDIA's model is governed by the NVIDIA Nemotron Open Model License, see [`NOTICE.md`](NOTICE.md). The Mamba-2 and causal-conv algorithms reimplemented here are from [state-spaces/mamba](https://github.com/state-spaces/mamba) (Apache-2.0, which is compatible with AGPL-3.0).

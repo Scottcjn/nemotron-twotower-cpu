@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Proves the mamba_shim kernels are numerically correct on THIS architecture.
 # Run before trusting the port on a new arch (ppc64le / arm64 / x86_64):
 #   python verify_kernels.py

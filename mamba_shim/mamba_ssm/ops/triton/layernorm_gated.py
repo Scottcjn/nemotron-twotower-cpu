@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Pure-torch shim for mamba_ssm.ops.triton.layernorm_gated.rmsnorm_fn
 # Matches Mamba-2 gated (group) RMSNorm semantics so NemotronH runs on CPU/ppc64le.
 import torch
