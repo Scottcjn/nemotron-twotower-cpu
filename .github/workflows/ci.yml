@@ -1,0 +1,63 @@
+name: CI (software-only)
+
+# This CI covers ONLY the hardware-independent surface of this repo: the
+# pure-PyTorch mamba_shim kernels and verify_kernels.py's numerical
+# self-test. It does NOT and CANNOT verify:
+#   - the actual TwoTower model output (requires the ~120GB gated
+#     NVIDIA model download, which this workflow will not fetch)
+#   - the patches/*.patch files applying cleanly to NVIDIA's
+#     modeling_nemotron_h.py / inference.py (those files aren't in
+#     this repo and are only obtained via the gated download)
+#   - real POWER8/ppc64le or Apple Silicon behavior (runners here are
+#     x86_64 only; see transcripts/ for the real-hardware runs)
+# The kernel-shim math itself is architecture-independent pure PyTorch,
+# so an x86_64 runner passing here is meaningful evidence, just not a
+# substitute for the ppc64le/arm64 runs already recorded in transcripts/.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify-kernel-shim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install CPU-only torch
+        run: pip install --index-url https://download.pytorch.org/whl/cpu torch
+
+      - name: Byte-compile all Python sources
+        run: python -m compileall -q mamba_shim verify_kernels.py
+
+      - name: Import smoke test (mamba_shim on PYTHONPATH, no CUDA)
+        env:
+          PYTHONPATH: mamba_shim
+          CUDA_VISIBLE_DEVICES: ""
+        run: |
+          python -c "
+          from mamba_ssm.ops.triton.layernorm_gated import rmsnorm_fn
+          from mamba_ssm.ops.triton.ssd_combined import mamba_chunk_scan_combined
+          from causal_conv1d import causal_conv1d_fn
+          print('mamba_shim imports resolve cleanly with no CUDA/Triton present')
+          "
+
+      - name: Run verify_kernels.py (numerical self-test, no model/network needed)
+        run: python verify_kernels.py
+
+      - name: Lint (pyflakes rules only - real bugs, not style)
+        run: |
+          pip install ruff
+          ruff check --select F .
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ShellCheck run.sh and setup.sh
+        run: shellcheck run.sh setup.sh
