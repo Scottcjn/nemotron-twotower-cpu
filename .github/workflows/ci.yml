@@ -30,7 +30,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install CPU-only torch
-        run: pip install --index-url https://download.pytorch.org/whl/cpu torch
+        run: pip install --index-url https://download.pytorch.org/whl/cpu torch || pip install torch
 
       - name: Byte-compile all Python sources
         run: python -m compileall -q mamba_shim verify_kernels.py
