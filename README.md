@@ -28,9 +28,12 @@ Three pieces, all small:
 
 2. **`patches/modeling_nemotron_h.cpu.patch`**, six one-line fixes to a code path NVIDIA never ran. Their `HybridMambaAttentionDynamicCache` stores `conv_states` / `ssm_states` as lists of per-layer tensors (as documented), but `torch_forward` and a few cache methods call `.device` / `.zero_()` on the *list* instead of `[layer_idx]`. These never fire on CUDA (the fast path skips `torch_forward` entirely), so they were latent until run on CPU. See [`UPSTREAM_BUGS.md`](UPSTREAM_BUGS.md), worth reporting upstream.
 
-3. **`patches/inference.cpu.patch`**, the demo `inference.py` hardcodes `.cuda()`; this maps it to CPU. The model itself is device-agnostic.
+3. **`patches/inference.cpu.patch`**, the demo `inference.py` hardcodes `.cuda()`; this maps it to CPU. The model itself is device-agnostic. It patches `inference_cpu.py`, a copy you make of NVIDIA's `inference.py`, so their file stays untouched and re-running the setup is safe.
 
 ## Quick start
+
+The short version is two commands: `bash setup.sh` (download + patch), then
+`bash run.sh "your prompt"`. Spelled out, that is:
 
 ```bash
 # 1. get NVIDIA's model + code (governed by their license, see NOTICE.md)
@@ -39,7 +42,8 @@ huggingface-cli download nvidia/Nemotron-Labs-TwoTower-30B-A3B-Base-BF16 --local
 # 2. apply the CPU patches
 cd twotower
 patch -p0 < ../patches/modeling_nemotron_h.cpu.patch
-patch -p0 < ../inference.cpu.patch   # writes inference_cpu.py
+cp inference.py inference_cpu.py                 # patched copy; NVIDIA's file stays as-is
+patch -p0 < ../patches/inference.cpu.patch
 
 # 3. run, with the shim on PYTHONPATH
 export PYTHONPATH=$PWD/../mamba_shim
@@ -48,7 +52,7 @@ python inference_cpu.py --mode mask_diffusion --max-new-tokens 32 \
     "Explain in one sentence why the sky is blue."
 ```
 
-Or just `bash run.sh "your prompt"`. Verify the kernels on your arch first with `python verify_kernels.py`.
+Steps 1 and 2 are exactly what `setup.sh` does; step 3 is what `run.sh` does. Verify the kernels on your arch first with `python verify_kernels.py`. `python -m pytest tests/` additionally checks the shim's seeded-scan/state paths and that the patches above still land where the scripts expect (no model download needed).
 
 ## Requirements
 
